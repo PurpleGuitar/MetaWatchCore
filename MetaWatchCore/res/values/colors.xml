@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Title bar colors -->
+    <color name="title_bar_background">#dddddd</color>
+    <color name="title_bar_foreground">#333333</color>
+    <color name="title_bar_selected">#ffffff</color>
+    
+    <!-- Connection colors -->
+    <color name="connection_connected">#00ff00</color>
+    <color name="connection_searching">#0000ff</color>
+    <color name="connection_disconnected">#000000</color>
+    
+</resources>

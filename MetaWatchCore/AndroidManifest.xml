@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	android:versionCode="1" android:versionName="1.0" package="org.metawatch.manager.core">
+	<uses-sdk android:minSdkVersion="7" />
+
+	<!-- Permissions -->
+	<uses-permission android:name="android.permission.BLUETOOTH"></uses-permission>
+	<uses-permission android:name="android.permission.BLUETOOTH_ADMIN"></uses-permission>
+    <uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
+	
+
+	<!-- Application -->
+	<application android:icon="@drawable/mw_icon"
+		android:label="@string/app_name">
+
+		<activity android:name=".ui.WatchList"
+			android:theme="@android:style/Theme.Light.NoTitleBar">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+		</activity>
+
+		<activity android:label="Watch Discovery"
+			android:theme="@android:style/Theme.Light.NoTitleBar"
+			android:configChanges="keyboardHidden|orientation"
+			android:launchMode="singleTask" android:name="org.metawatch.manager.core.ui.WatchDiscovery">
+		</activity>
+		<service android:name="org.metawatch.manager.core.service.WatchService"></service>
+
+	</application>
+</manifest>

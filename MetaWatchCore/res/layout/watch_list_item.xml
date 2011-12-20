@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="wrap_content"
+	android:orientation="horizontal">
+
+	<ImageView android:id="@+id/watch_list_item_icon"
+		android:layout_width="64sp" android:layout_height="64sp" 
+		android:layout_marginLeft="4sp" android:layout_marginRight="4sp"
+		android:layout_marginTop="10sp" android:src="@drawable/mw_icon">
+	</ImageView>
+
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:orientation="vertical">
+
+		<TextView android:id="@+id/watch_list_item_name"
+			android:layout_width="fill_parent" android:layout_height="wrap_content"
+			android:layout_marginTop="6px" android:lines="1" android:textSize="22px"
+			android:textStyle="bold">
+			
+		</TextView>
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:layout_marginTop="6px"
+                android:lines="1" android:textSize="22px" android:text="State: ">
+            </TextView>
+            <TextView android:id="@+id/watch_list_item_connectionState"
+                android:layout_width="fill_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="6px" android:lines="1" android:textSize="22px" android:text="Unknown">
+            </TextView>
+        </LinearLayout>
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:layout_marginTop="6px"
+                android:lines="1" android:textSize="22px" android:text="Battery: ">
+            </TextView>
+            <TextView android:id="@+id/watch_list_item_battery"
+                android:layout_width="fill_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="6px" android:lines="1" android:textSize="22px" android:text="Unknown">
+            </TextView>
+        </LinearLayout>
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:layout_marginTop="6px"
+                android:lines="1" android:textSize="22px" android:text="Type: ">
+            </TextView>
+            <TextView android:id="@+id/watch_list_item_type"
+                android:layout_width="fill_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="6px" android:lines="1" android:textSize="22px" android:text="Unknown">
+            </TextView>
+        </LinearLayout>
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:layout_marginTop="6px"
+                android:lines="1" android:textSize="22px" android:text="MAC: ">
+            </TextView>
+            <TextView android:id="@+id/watch_list_item_mac"
+                android:layout_width="fill_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="6px" android:lines="1" android:textSize="22px">
+            </TextView>
+        </LinearLayout>
+
+	</LinearLayout>
+
+
+</LinearLayout>

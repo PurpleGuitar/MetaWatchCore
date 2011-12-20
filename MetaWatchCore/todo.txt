@@ -1,0 +1,70 @@
+TODO
+===============================================================================
+
+
+WISH LIST
+===============================================================================
+
+
+
+DONE
+===============================================================================
+
+12/4/2011
+
+[x] Connect to two watches simultaneously.
+
+    [x] Create screen that lists configured watches.
+    
+        [x] Store information about configured watches.
+            [x] Create database for watch info.
+                [x] Create DatabaseHelper for watch info.
+                    - watch MAC
+                    - watch type
+                    - name?
+                    - Do we need anything else?      
+                                 
+        [x] Allow user to add new watch.
+            [x] Click "Add New watch"
+            [x] Discover watches.
+            [x] Present user with a list of discovered watches.
+            [x] Add new watch to database, if not already present.
+                [x] Ask database if this watch is present.
+                [x] If not, add it.
+            [x] Return to watch list, refresh.
+
+        [x] Allow user to delete watch.
+
+        [x] Display basic information about watch.
+            [x] Name
+            [x] MAC
+            
+    [x] Connect to configured watches.
+
+    [x] Display run-time info about watch.    
+        [x] Type (analog/digital)
+        [x] Status (connected, searching, etc.)
+        
+[x] Auto-reconnect?       
+
+[x] Display battery level on MWM?
+
+12/16/2011
+
+[x] Create satellite app that forwards received SMSs to the watches.
+    [x] Create notifications intent structure?
+        - We should use intents instead of binding to the service -- inter
+          process binding uses Message objects anyway; might as well just
+          use Intents.
+          
+12/20/2011
+
+x Implement scrolling on analog watch.
+x Simple text display on digital watch.
+x Send idle screens to BOTH watches!!!
+x Widget display
+x Resolve sender name on SMS receipt
+x Better icon for SMS app
+x MW headers for all files
+
+          

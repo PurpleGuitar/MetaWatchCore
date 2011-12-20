@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+
+	<RelativeLayout android:id="@+id/watch_discovery_titlebar_layout"
+		android:layout_width="fill_parent" android:layout_height="48sp"
+		android:orientation="horizontal" android:background="@color/title_bar_background">
+
+		<!-- <Button android:id="@+id/watch_discovery_refresh_button" android:layout_width="48sp" 
+			android:layout_height="48sp" android:layout_gravity="center" android:text="@string/watch_discovery_refresh_button_text" 
+			android:layout_alignParentRight="true" android:textSize="24sp" android:background="@drawable/title_bar_button_style" 
+			android:textColor="@color/title_bar_foreground" android:onClick="startDiscovery" 
+			/> -->
+
+		<ImageView android:id="@+id/watch_discovery_titlebar_logo"
+			android:src="@drawable/mw_icon" android:layout_width="48sp"
+			android:layout_height="48sp" android:layout_gravity="center"
+			android:layout_alignParentLeft="true" android:padding="5sp" />
+
+		<TextView android:text="@string/watch_discovery_titlebar_text"
+			android:id="@+id/watch_discovery_titlebar_text_view"
+			android:layout_width="fill_parent" android:layout_height="wrap_content"
+			android:textSize="24sp" android:layout_gravity="center"
+			android:layout_toRightOf="@id/watch_discovery_titlebar_logo"
+			android:textStyle="bold" android:textColor="@color/title_bar_foreground"
+			android:paddingLeft="5sp" android:paddingTop="8sp">
+		</TextView>
+	</RelativeLayout>
+
+	<LinearLayout android:id="@+id/layout"
+		android:layout_width="fill_parent" android:layout_height="fill_parent">
+		<ListView android:id="@android:id/list"
+			android:layout_height="fill_parent" android:layout_width="fill_parent">
+		</ListView>
+	</LinearLayout>
+</LinearLayout>

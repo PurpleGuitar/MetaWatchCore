@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello World!</string>
+    <string name="app_name">MetaWatch Core</string>
+    
+    <string name="watch_list_titlebar_text">MetaWatch</string>
+    <string name="watch_list_add_watch_button_text">+</string>
+    <string name="watch_list_refresh_button_text">Refresh</string>
+    <string name="watch_list_no_watches">Looking for watches, please wait.\n\nIf you have not yet paired any watches, please touch the \"+\" button to get started.</string>
+    <string name="watch_list_connect_watch">Connect</string>
+    <string name="watch_list_disconnect_watch">Disconnect</string>
+    <string name="watch_list_forget_watch">Forget this watch</string>
+    
+    <string name="watch_discovery_titlebar_text">Discover</string>
+    <string name="watch_discovery_refresh_button_text">Refresh</string>
+    <string name="watch_discovery_no_watches">No watches discovered.  Please touch "Refresh" to search for watches.</string>
+    
+</resources>
