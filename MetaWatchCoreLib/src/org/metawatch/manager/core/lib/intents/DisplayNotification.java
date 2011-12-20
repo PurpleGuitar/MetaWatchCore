@@ -25,9 +25,9 @@ import android.content.Intent;
 
 public class DisplayNotification {
 
-	public static final String	DISPLAY_NOTIFICAION_REQUEST_INTENT_ACTION	= WatchIntentConstants.INTENT_PACKAGE
+	public static final String	DISPLAY_NOTIFICAION_INTENT_ACTION	= WatchIntentConstants.INTENT_PACKAGE
 																					+ "."
-																					+ "DISPLAY_NOTIFICATION_REQUEST";
+																					+ "DISPLAY_NOTIFICATION";
 	/* Vibration */
 	public static final String	VIBRATE_ON_DURATION_EXTRA					= "vibrateOnDuration";
 	public static final String	VIBRATE_OFF_DURATION_EXTRA					= "vibrateOffDuration";
@@ -55,7 +55,7 @@ public class DisplayNotification {
 	public String				lcdText										= "";
 
 	public Intent toIntent() {
-		Intent intent = new Intent(DISPLAY_NOTIFICAION_REQUEST_INTENT_ACTION);
+		Intent intent = new Intent(DISPLAY_NOTIFICAION_INTENT_ACTION);
 		intent.putExtra(VIBRATE_ON_DURATION_EXTRA, vibrateOnDuration);
 		intent.putExtra(VIBRATE_OFF_DURATION_EXTRA, vibrateOffDuration);
 		intent.putExtra(VIBRATE_NUMBER_OF_CYCLES_EXTRA, vibrateNumberOfCycles);
@@ -72,7 +72,7 @@ public class DisplayNotification {
 	public static DisplayNotification fromIntent(Intent intent) {
 		DisplayNotification request = new DisplayNotification();
 		if (intent.getAction()
-				.equals(DISPLAY_NOTIFICAION_REQUEST_INTENT_ACTION) == false) {
+				.equals(DISPLAY_NOTIFICAION_INTENT_ACTION) == false) {
 			throw new IllegalArgumentException(
 					"Not a DisplayNotificationRequest!");
 		}

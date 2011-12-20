@@ -85,7 +85,7 @@ public class WatchService extends Service {
 						.start();
 			} else if (intent
 					.getAction()
-					.equals(DisplayNotification.DISPLAY_NOTIFICAION_REQUEST_INTENT_ACTION)) {
+					.equals(DisplayNotification.DISPLAY_NOTIFICAION_INTENT_ACTION)) {
 				DisplayNotification req = DisplayNotification
 						.fromIntent(intent);
 				for (WatchConnection connection : connections) {
@@ -243,7 +243,7 @@ public class WatchService extends Service {
 		registerReceiver(watchServiceBroadcastReceiver, new IntentFilter(
 				WatchIntentConstants.DISCONNECT_INTENT_ACTION));
 		registerReceiver(watchServiceBroadcastReceiver, new IntentFilter(
-				DisplayNotification.DISPLAY_NOTIFICAION_REQUEST_INTENT_ACTION));
+				DisplayNotification.DISPLAY_NOTIFICAION_INTENT_ACTION));
 		registerReceiver(
 				watchServiceBroadcastReceiver,
 				new IntentFilter(
