@@ -1,32 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	android:versionCode="1" android:versionName="1.0" package="org.metawatch.manager.core">
-	<uses-sdk android:minSdkVersion="7" />
+    package="org.metawatch.manager.core"
+    android:versionCode="1"
+    android:versionName="1.0" >
 
-	<!-- Permissions -->
-	<uses-permission android:name="android.permission.BLUETOOTH"></uses-permission>
-	<uses-permission android:name="android.permission.BLUETOOTH_ADMIN"></uses-permission>
-    <uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
-	
+    <uses-sdk android:minSdkVersion="7" />
 
-	<!-- Application -->
-	<application android:icon="@drawable/mw_icon"
-		android:label="@string/app_name">
+    <!-- Permissions -->
+    <uses-permission android:name="android.permission.BLUETOOTH" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.WAKE_LOCK" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" >
+    </uses-permission>
 
-		<activity android:name=".ui.WatchList"
-			android:theme="@android:style/Theme.Light.NoTitleBar">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
-				<category android:name="android.intent.category.LAUNCHER" />
-			</intent-filter>
-		</activity>
+    <!-- Application -->
+    <application
+        android:icon="@drawable/mw_icon"
+        android:label="@string/app_name" >
+        <activity
+            android:name=".ui.WatchList"
+            android:theme="@android:style/Theme.Light.NoTitleBar" >
+            <intent-filter >
+                <action android:name="android.intent.action.MAIN" />
 
-		<activity android:label="Watch Discovery"
-			android:theme="@android:style/Theme.Light.NoTitleBar"
-			android:configChanges="keyboardHidden|orientation"
-			android:launchMode="singleTask" android:name="org.metawatch.manager.core.ui.WatchDiscovery">
-		</activity>
-		<service android:name="org.metawatch.manager.core.service.WatchService"></service>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:configChanges="keyboardHidden|orientation"
+            android:label="Watch Discovery"
+            android:launchMode="singleTask"
+            android:name=".ui.WatchDiscovery"
+            android:theme="@android:style/Theme.Light.NoTitleBar" >
+        </activity>
 
-	</application>
+        <service android:name=".service.WatchService" >
+        </service>
+
+        <receiver android:name=".service.WatchService$BootBroadcastReceiver" >
+            <intent-filter >
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.HOME" />
+            </intent-filter>
+        </receiver>
+    </application>
+
 </manifest>
