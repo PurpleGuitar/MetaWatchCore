@@ -88,6 +88,8 @@ public class MetaWatchSMSService extends Service {
 		Uri uri = Uri.parse("content://mms-sms/conversations/");
 		ContentResolver contentResolver = getContentResolver();
 		contentResolver.registerContentObserver(uri, true, smsObserver);
+		Log.d(Constants.LOG_TAG,
+				"MetaWatchSMSService.onCreate(): Service started.");
 	}
-	
+
 }

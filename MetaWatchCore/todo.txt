@@ -2,21 +2,73 @@ TODO
 ===============================================================================
 
 
+    
+
 WISH LIST
 ===============================================================================
-
-- Make SMS app start its service on boot.
-
-- Create phone app.
-    - Vibrate watch on incoming call
-    - Display missed calls on idle screen
+    
+- Create Google Music app
+    - Send notification to watch on track change
+    - Display album art?
+    - Hook button to skip to next track?
+    - Hook button to pause music?
+    - Is a service needed?  If so, start on boot
+    - Full-screen application mode?    
+    
+- Create GMail app.
+    - Vibrate watch on incoming email
+    - Display unread GMail
     - Start service on boot?
+    
+- Create weather app.
+    - Display current conditions
+    - Display today's hi/lo?
+    - Display tomorrow's weather?
+    - Start service on boot
     
 - Use Benji's sticky notifications
     - Add icon extra to display notification intent 
     - Add title extra to display notification intent
     - Hook lower right button on notification
     - Pull benji's awesome display routines
-    - On button press, return to normal
-     
+    - On button press, return to normal (& unhook button)
     
+- Create intent wrappers for all intents, not just the busy ones.
+
+- Create constructors for the common configurations of
+  the display notification intent.    
+    
+- Move all received intents to the manifest; better to list
+  them publicly than subscribe to them on the fly... right?
+     
+- Allow user to select which widgets to display on idle screen
+    
+- Allow different-sized widgets
+
+- Replay last notification (via app menu?)
+
+- Allow apps to interact via application mode
+
+- Reject incoming call from watch?
+
+
+DONE
+===============================================================================
+
+x Create phone app.
+    x Proper icon.
+    x Add permissions to manifest
+        - What permissions are needed?
+            <uses-permission android:name="android.permission.READ_PHONE_STATE"></uses-permission>
+            <uses-permission android:name="android.permission.READ_CONTACTS"></uses-permission>
+            <uses-permission android:name="android.permission.CALL_PHONE"></uses-permission>
+    x Display missed calls on idle screen
+    x Get notified on incoming call.
+        x We'll need a PhoneStateListener -- borrow from stock MW 
+            telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+            int phoneEvents = PhoneStateListener.LISTEN_CALL_STATE;
+            telephonyManager.listen(phoneListener, phoneEvents);
+        x Test with real call -- does our listener get notified?        
+    x Vibrate watch on incoming call, display caller
+    x How do we find out when missed calls have changed?
+    x Start service on boot?

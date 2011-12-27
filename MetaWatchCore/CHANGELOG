@@ -1,6 +1,9 @@
 v0.1.2
 -------------------------------------------------------------------------------
 
+- Added MetaWatch Phone app.  This notifies the watches on an incoming call, 
+  and displays a missed call widget on the watch idle screens.
+
 - Start SMS service on boot.  This should fix the bug where the SMS widget
   sometimes didn't redraw after a reboot.
 

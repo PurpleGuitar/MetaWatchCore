@@ -22,14 +22,13 @@
 package org.metawatch.manager.sms;
 
 import org.metawatch.manager.core.lib.intents.DisplayNotification;
+import org.metawatch.manager.core.lib.intents.WatchIntentConstants;
+import org.metawatch.manager.core.lib.utils.Utils;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract.PhoneLookup;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
@@ -49,9 +48,8 @@ public class IntentReceiver extends BroadcastReceiver {
 					String body = smsMessage[i].getDisplayMessageBody();
 
 					/* Attempt to resolve contact name */
-					number = getContactNameFromNumber(context, number);
+					number = Utils.getContactNameFromNumber(context, number);
 
-					// NotificationBuilder.createSMS(context, number, body);
 					Log.d(Constants.LOG_TAG,
 							"IntentReceiver.onReceive(): Received SMS: number='"
 									+ number + "' body='" + body + "'");
@@ -72,8 +70,8 @@ public class IntentReceiver extends BroadcastReceiver {
 				}
 			}
 			return;
-		} else if (action
-				.equals("org.metawatch.manager.core.DISPLAY_IDLE_SCREEN_WIDGET_REQUEST")) {
+		} else if (intent.getAction().equals(
+				WatchIntentConstants.DISPLAY_IDLE_SCREEN_WIDGET_REQUEST)) {
 			context.startService(new Intent(context, MetaWatchSMSService.class));
 			IdleScreenWidgetRenderer.sendIdleScreenWidgetUpdate(context);
 		} else if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
@@ -84,28 +82,4 @@ public class IntentReceiver extends BroadcastReceiver {
 
 	}
 
-	public static String getContactNameFromNumber(Context context, String number) {
-
-		if (number.equals(""))
-			return "Private number";
-
-		String[] projection = new String[] { PhoneLookup.DISPLAY_NAME,
-				PhoneLookup.NUMBER };
-		Uri contactUri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI,
-				Uri.encode(number));
-		Cursor c = context.getContentResolver().query(contactUri, projection,
-				null, null, null);
-
-		if (c.moveToFirst()) {
-			String name = c.getString(c
-					.getColumnIndex(PhoneLookup.DISPLAY_NAME));
-
-			if (name.length() > 0)
-				return name;
-			else
-				return number;
-		}
-
-		return number;
-	}
 }
