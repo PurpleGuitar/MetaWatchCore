@@ -48,8 +48,6 @@ public class MetaWatchSMSService extends Service {
 		@Override
 		public void onChange(boolean selfChange) {
 			super.onChange(selfChange);
-			Log.d(Constants.LOG_TAG,
-					"SMSObserver.onChange(): Observed change to SMS.");
 			int count = getUnreadSmsCount(context);
 			if (count != lastObservedCount) {
 				Log.d(Constants.LOG_TAG,

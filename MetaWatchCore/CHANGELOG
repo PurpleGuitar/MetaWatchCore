@@ -1,4 +1,10 @@
+v0.1.2
+-------------------------------------------------------------------------------
+
+- Start SMS service on boot.  This should fix the bug where the SMS widget
+  sometimes didn't redraw after a reboot.
+
 v0.1.1
 -------------------------------------------------------------------------------
 
-- Start on boot.
+- Start core on boot.
