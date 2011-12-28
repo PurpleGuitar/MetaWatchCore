@@ -30,7 +30,7 @@
         android:id="@+id/button1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Test Idle Screen Widget"
-        android:onClick="testIdleScreenWidget" />
+        android:text="Update Idle Screen Widget"
+        android:onClick="updateIdleScreenWidget" />
 
 </LinearLayout>

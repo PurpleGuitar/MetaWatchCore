@@ -1,24 +1,24 @@
- /*****************************************************************************
-  *  Some of the code in this project is derived from the                     *
-  *  MetaWatch MWM-for-Android project,                                       *
-  *  Copyright (c) 2011 Meta Watch Ltd.                                       *
-  *  www.MetaWatch.org                                                        *
-  *                                                                           *
-  =============================================================================
-  *                                                                           *
-  *  Licensed under the Apache License, Version 2.0 (the "License");          *
-  *  you may not use this file except in compliance with the License.         *
-  *  You may obtain a copy of the License at                                  *
-  *                                                                           *
-  *    http://www.apache.org/licenses/LICENSE-2.0                             *
-  *                                                                           *
-  *  Unless required by applicable law or agreed to in writing, software      *
-  *  distributed under the License is distributed on an "AS IS" BASIS,        *
-  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
-  *  See the License for the specific language governing permissions and      *
-  *  limitations under the License.                                           *
-  *                                                                           *
-  *****************************************************************************/
+/*****************************************************************************
+ *  Some of the code in this project is derived from the                     *
+ *  MetaWatch MWM-for-Android project,                                       *
+ *  Copyright (c) 2011 Meta Watch Ltd.                                       *
+ *  www.MetaWatch.org                                                        *
+ *                                                                           *
+ =============================================================================
+ *                                                                           *
+ *  Licensed under the Apache License, Version 2.0 (the "License");          *
+ *  you may not use this file except in compliance with the License.         *
+ *  You may obtain a copy of the License at                                  *
+ *                                                                           *
+ *    http://www.apache.org/licenses/LICENSE-2.0                             *
+ *                                                                           *
+ *  Unless required by applicable law or agreed to in writing, software      *
+ *  distributed under the License is distributed on an "AS IS" BASIS,        *
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+ *  See the License for the specific language governing permissions and      *
+ *  limitations under the License.                                           *
+ *                                                                           *
+ *****************************************************************************/
 package org.metawatch.manager.core.renderer;
 
 import java.util.ArrayList;
@@ -48,11 +48,74 @@ public class AnalogWatchRenderer extends DefaultWatchRenderer {
 	@Override
 	public WatchMessage renderNotification(Context context,
 			DisplayNotification req) {
-
 		Log.d(Constants.LOG_TAG,
 				"AnalogWatchRenderer.renderNotification(): req=" + req);
-
 		WatchMessage message = super.renderNotification(context, req);
+
+		switch (req.notificationLayout) {
+		case GENERIC:
+			renderGenericNotification(context, req, message);
+			break;
+		case SPECIFIC:
+			renderSpecificNotification(context, req, message);
+			break;
+		default:
+			throw new IllegalArgumentException("Unknown notification layout: "
+					+ req.notificationLayout);
+
+		}
+
+		return message;
+	}
+
+	private void renderGenericNotification(Context context,
+			DisplayNotification req, WatchMessage message) {
+		List<WatchPacket> packets = message.getPackets();
+
+		/* Render top OLED. */
+		if (req.genericIcon == null) {
+			packets.addAll(convertDisplayDataToWriteOLEDBufferPackets(context,
+					WatchMode.NOTIFICATION, OLEDPosition.TOP,
+					renderOLED1Line(context, req.genericTitle)));
+		} else {
+			packets.addAll(convertDisplayDataToWriteOLEDBufferPackets(context,
+					WatchMode.NOTIFICATION, OLEDPosition.TOP,
+					renderOLED1Line(context, req.genericIcon, req.genericTitle)));
+		}
+
+		/* Render bottom OLED. */
+			packets.addAll(convertDisplayDataToWriteOLEDBufferPackets(
+					context,
+					WatchMode.NOTIFICATION,
+					OLEDPosition.BOTTOM,
+					renderOled2lines(context, req.genericSubTitle,
+							req.genericBody)));
+
+		/* Set watch to notification mode */
+		packets.add(new WriteOLEDBuffer(context, WatchMode.NOTIFICATION,
+				OLEDPosition.TOP, true, 0, null));
+		packets.add(new WriteOLEDBuffer(context, WatchMode.NOTIFICATION,
+				OLEDPosition.BOTTOM, true, 0, null));
+
+		/* Generate scroll data. */
+		if (req.genericBody.length() > 0) {
+			byte[] scrollBuffer = renderOledScrollBuffer(context,
+					req.genericBody);
+			if (scrollBuffer == null) {
+				Log.d(Constants.LOG_TAG,
+						"AnalogWatchRenderer.renderGenericNotification(): no scroll buffer needed");
+			} else {
+				Log.d(Constants.LOG_TAG,
+						"AnalogWatchRenderer.renderGenericNotification(): scroll buffer length="
+								+ scrollBuffer.length);
+				packets.addAll(convertDisplayDataToWriteOLEDScrollBufferPackets(scrollBuffer));
+			}
+		}
+
+	}
+
+	private void renderSpecificNotification(Context context,
+			DisplayNotification req, WatchMessage message) {
 		List<WatchPacket> packets = message.getPackets();
 
 		/* Render top OLED. */
@@ -97,21 +160,19 @@ public class AnalogWatchRenderer extends DefaultWatchRenderer {
 					req.oledBottomLine2Text);
 			if (scrollBuffer == null) {
 				Log.d(Constants.LOG_TAG,
-						"AnalogWatchRenderer.renderNotification(): null scroll buffer");
+						"AnalogWatchRenderer.renderSpecifcNotification(): No scroll buffer needed");
 			} else {
 				Log.d(Constants.LOG_TAG,
-						"AnalogWatchRenderer.renderNotification(): scroll buffer length="
+						"AnalogWatchRenderer.renderSpecificNotification(): scroll buffer length="
 								+ scrollBuffer.length);
 				packets.addAll(convertDisplayDataToWriteOLEDScrollBufferPackets(scrollBuffer));
 			}
 		}
 
-		return message;
 	}
 
 	@Override
 	public WatchMessage renderIdleScreen(Context context) {
-		// TODO Auto-generated method stub
 		WatchMessage message = super.renderIdleScreen(context);
 		List<WatchPacket> packets = message.getPackets();
 
@@ -121,14 +182,10 @@ public class AnalogWatchRenderer extends DefaultWatchRenderer {
 		Bitmap topImage = Bitmap.createBitmap(80, 16, Bitmap.Config.RGB_565);
 		Canvas topCanvas = new Canvas(topImage);
 		topCanvas.drawColor(Color.WHITE);
-		// topCanvas.drawLine(0, 0, 79, 15, paint);
-		// topCanvas.drawLine(0, 15, 79, 0, paint);
 
 		Bitmap bottomImage = Bitmap.createBitmap(80, 16, Bitmap.Config.RGB_565);
 		Canvas bottomCanvas = new Canvas(bottomImage);
 		bottomCanvas.drawColor(Color.WHITE);
-		// bottomCanvas.drawLine(0, 0, 79, 15, paint);
-		// bottomCanvas.drawLine(0, 15, 79, 0, paint);
 
 		/* Draw widgets */
 		Canvas canvas = topCanvas;
@@ -185,8 +242,6 @@ public class AnalogWatchRenderer extends DefaultWatchRenderer {
 
 	/** Renders a packed byte array containing the render of the given text. */
 	private static byte[] renderOLED1Line(Context context, String text) {
-
-		int offset = 0;
 		Bitmap image = Bitmap.createBitmap(80, 16, Bitmap.Config.RGB_565);
 		Canvas canvas = new Canvas(image);
 		Paint paint = new Paint();
@@ -196,6 +251,33 @@ public class AnalogWatchRenderer extends DefaultWatchRenderer {
 				"metawatch_16pt_11pxl.ttf");
 		paint.setTypeface(typeface);
 		canvas.drawColor(Color.WHITE);
+		canvas.drawText(text, 0, 14, paint);
+		return createDisplayDataFromBitmap(image);
+
+	}
+
+	/**
+	 * Renders a packed byte array containing the render of the given icon and
+	 * text.
+	 */
+	private static byte[] renderOLED1Line(Context context, byte[] iconBytes,
+			String text) {
+
+		Bitmap image = Bitmap.createBitmap(80, 16, Bitmap.Config.RGB_565);
+		Canvas canvas = new Canvas(image);
+		canvas.drawColor(Color.WHITE);
+
+		Bitmap icon = BitmapFactory.decodeByteArray(iconBytes, 0,
+				iconBytes.length);
+		canvas.drawBitmap(icon, 0, 0, null);
+		int offset = icon.getWidth() + 1;
+
+		Paint paint = new Paint();
+		paint.setColor(Color.BLACK);
+		paint.setTextSize(16);
+		Typeface typeface = Typeface.createFromAsset(context.getAssets(),
+				"metawatch_16pt_11pxl.ttf");
+		paint.setTypeface(typeface);
 		canvas.drawText(text, offset, 14, paint);
 
 		return createDisplayDataFromBitmap(image);

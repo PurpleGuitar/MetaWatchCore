@@ -1,6 +1,19 @@
 TODO
 ===============================================================================
 
+- Use Benji's sticky notifications
+    x Add generic icon extra to display notification intent 
+    x Add generic title extra to display notification intent
+    x Add generic subtitle extra to display notification intent
+    x Add generic body extra to display notification intent
+    x Alter SMS app to use new generic notification
+    x Alter Phone app to use new generic notification
+    x Add code to render generic intent
+        x analog
+        x digital (borrow Benji's display?)
+    x Digital only: pause notification until user accepts it?
+        x Hook lower right button on notification
+        x On button press, return to normal (& unhook button)
 
     
 
@@ -24,14 +37,7 @@ WISH LIST
     - Display current conditions
     - Display today's hi/lo?
     - Display tomorrow's weather?
-    - Start service on boot
-    
-- Use Benji's sticky notifications
-    - Add icon extra to display notification intent 
-    - Add title extra to display notification intent
-    - Hook lower right button on notification
-    - Pull benji's awesome display routines
-    - On button press, return to normal (& unhook button)
+    - Start service on boot    
     
 - Create intent wrappers for all intents, not just the busy ones.
 
@@ -50,6 +56,12 @@ WISH LIST
 - Allow apps to interact via application mode
 
 - Reject incoming call from watch?
+    - Is this even possible?
+
+- Page notification on digital watch?
+    - If body text overflows, display down arrow intead of 'X'
+    - On button press display next page of notification
+
 
 
 DONE

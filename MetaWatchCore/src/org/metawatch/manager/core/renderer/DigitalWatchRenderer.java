@@ -1,24 +1,24 @@
- /*****************************************************************************
-  *  Some of the code in this project is derived from the                     *
-  *  MetaWatch MWM-for-Android project,                                       *
-  *  Copyright (c) 2011 Meta Watch Ltd.                                       *
-  *  www.MetaWatch.org                                                        *
-  *                                                                           *
-  =============================================================================
-  *                                                                           *
-  *  Licensed under the Apache License, Version 2.0 (the "License");          *
-  *  you may not use this file except in compliance with the License.         *
-  *  You may obtain a copy of the License at                                  *
-  *                                                                           *
-  *    http://www.apache.org/licenses/LICENSE-2.0                             *
-  *                                                                           *
-  *  Unless required by applicable law or agreed to in writing, software      *
-  *  distributed under the License is distributed on an "AS IS" BASIS,        *
-  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
-  *  See the License for the specific language governing permissions and      *
-  *  limitations under the License.                                           *
-  *                                                                           *
-  *****************************************************************************/
+/*****************************************************************************
+ *  Some of the code in this project is derived from the                     *
+ *  MetaWatch MWM-for-Android project,                                       *
+ *  Copyright (c) 2011 Meta Watch Ltd.                                       *
+ *  www.MetaWatch.org                                                        *
+ *                                                                           *
+ =============================================================================
+ *                                                                           *
+ *  Licensed under the Apache License, Version 2.0 (the "License");          *
+ *  you may not use this file except in compliance with the License.         *
+ *  You may obtain a copy of the License at                                  *
+ *                                                                           *
+ *    http://www.apache.org/licenses/LICENSE-2.0                             *
+ *                                                                           *
+ *  Unless required by applicable law or agreed to in writing, software      *
+ *  distributed under the License is distributed on an "AS IS" BASIS,        *
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+ *  See the License for the specific language governing permissions and      *
+ *  limitations under the License.                                           *
+ *                                                                           *
+ *****************************************************************************/
 package org.metawatch.manager.core.renderer;
 
 import java.util.ArrayList;
@@ -49,6 +49,96 @@ public class DigitalWatchRenderer extends DefaultWatchRenderer {
 			DisplayNotification req) {
 		WatchMessage message = super.renderNotification(context, req);
 
+		switch (req.notificationLayout) {
+		case GENERIC:
+			renderGenericNotification(context, req, message);
+			break;
+		case SPECIFIC:
+			renderSpecificNotification(context, req, message);
+			break;
+		default:
+			throw new IllegalArgumentException("Unknown notification layout: "
+					+ req.notificationLayout);
+
+		}		
+
+		/* Set watch mode to notification */
+		message.getPackets().add(new UpdateLCDDisplay(WatchMode.NOTIFICATION));
+
+		return message;
+	}
+	
+	private void renderGenericNotification(Context context,
+			DisplayNotification req, WatchMessage message) {
+
+		/* Create empty bitmap. */
+		Bitmap bitmap = Bitmap.createBitmap(96, 96, Bitmap.Config.RGB_565);
+		Canvas canvas = new Canvas(bitmap);
+		canvas.drawColor(Color.WHITE);
+
+		/* Draw icon if present */
+		int xOffset = 0;
+		int yOffset = 0;
+		if (req.genericIcon != null) {
+			Bitmap icon = BitmapFactory.decodeByteArray(req.genericIcon, 0,
+					req.genericIcon.length);
+			canvas.drawBitmap(icon, 0, 0, null);
+			xOffset = icon.getWidth() + 1;		
+		}
+		
+		/* Draw title */
+		String titleFont = "metawatch_16pt_11pxl.ttf";
+		Typeface typeface = Typeface.createFromAsset(context.getAssets(), titleFont);
+		Paint paint = new Paint();
+		paint.setColor(Color.BLACK);
+		paint.setTypeface(typeface);
+		paint.setTextSize(16);
+		canvas.drawText(req.genericTitle, xOffset, yOffset + 14, paint);		
+		
+		/* Next row */
+		xOffset = 0;
+		yOffset += 17;
+		
+		/* Draw subTitle */
+		String subTitleFont = "metawatch_8pt_7pxl_CAPS.ttf";
+		typeface = Typeface.createFromAsset(context.getAssets(), subTitleFont);
+		paint.setTypeface(typeface);
+		paint.setTextSize(8);
+		canvas.drawText(req.genericSubTitle, xOffset, yOffset + 7, paint);	
+		
+		/* Next row */
+		xOffset = 0;
+		yOffset += 8;
+		
+		/* Draw lines */
+		canvas.drawLine(xOffset, yOffset, 88, yOffset, paint);
+		canvas.drawLine(88, yOffset, 88, 96, paint);
+		
+		/* Draw X button */
+		canvas.drawText("x", 90, 93, paint);	
+		
+		/* Next row */
+		xOffset = 0;
+		yOffset += 2;
+		
+		/* Render body text */
+		String bodyFont = "metawatch_8pt_5pxl_CAPS.ttf";
+		typeface = Typeface.createFromAsset(context.getAssets(), bodyFont);
+		paint.setTypeface(typeface);
+		paint.setTextSize(8);
+		TextPaint textPaint = new TextPaint(paint);
+		StaticLayout staticLayout = new StaticLayout(req.genericBody, textPaint, 88,
+				android.text.Layout.Alignment.ALIGN_NORMAL, 1.3f, 0, false);
+		canvas.translate(xOffset, yOffset); // position the text
+		staticLayout.draw(canvas);
+		
+		message.getPackets().addAll(
+				createPacketsFromBitmap(bitmap, WatchMode.NOTIFICATION));
+	}
+
+	private void renderSpecificNotification(Context context,
+			DisplayNotification req, WatchMessage message) {
+		
 		/* Render text to bitmap */
 		if (req.lcdText.length() > 0) {
 			Bitmap bitmap = createTextBitmap(context, req.lcdText);
@@ -56,11 +146,9 @@ public class DigitalWatchRenderer extends DefaultWatchRenderer {
 					createPacketsFromBitmap(bitmap, WatchMode.NOTIFICATION));
 		}
 
-		/* Set watch mode to notification */
-		message.getPackets().add(new UpdateLCDDisplay(WatchMode.NOTIFICATION));
-
-		return message;
 	}
+
+	
 
 	@Override
 	public WatchMessage renderIdleScreen(Context context) {
@@ -173,23 +261,17 @@ public class DigitalWatchRenderer extends DefaultWatchRenderer {
 		Typeface typeface = Typeface.createFromAsset(context.getAssets(), font);
 		paint.setTypeface(typeface);
 		canvas.drawColor(Color.WHITE);
-		canvas = breakText(canvas, text, paint, 0, 0);
-		/*
-		 * FileOutputStream fos = new FileOutputStream("/sdcard/test.png");
-		 * image.compress(Bitmap.CompressFormat.PNG, 100, fos); fos.close();
-		 * Log.d("ow", "bmp ok");
-		 */
+		breakText(canvas, text, paint, 0, 0);
 		return bitmap;
 	}
 
-	private static Canvas breakText(Canvas canvas, String text, Paint pen,
+	private static void breakText(Canvas canvas, String text, Paint pen,
 			int x, int y) {
 		TextPaint textPaint = new TextPaint(pen);
 		StaticLayout staticLayout = new StaticLayout(text, textPaint, 98,
 				android.text.Layout.Alignment.ALIGN_NORMAL, 1.3f, 0, false);
 		canvas.translate(x, y); // position the text
 		staticLayout.draw(canvas);
-		return canvas;
 	}
 
 }

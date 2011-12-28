@@ -28,11 +28,22 @@ import org.metawatch.manager.core.lib.utils.Utils;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
 public class IntentReceiver extends BroadcastReceiver {
+
+	private static byte[]	smsIcon	= null;
+
+	static byte[] getSMSIcon(Context context) {
+		if (smsIcon == null) {
+			Bitmap bitmap = Utils.loadBitmapFromAssets(context, "sms_icon.bmp");
+			smsIcon = Utils.compressBitmap(bitmap);
+		}
+		return smsIcon;
+	}
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -48,23 +59,24 @@ public class IntentReceiver extends BroadcastReceiver {
 					String body = smsMessage[i].getDisplayMessageBody();
 
 					/* Attempt to resolve contact name */
-					number = Utils.getContactNameFromNumber(context, number);
+					String name = Utils.getContactNameFromNumber(context,
+							number);
 
 					Log.d(Constants.LOG_TAG,
 							"IntentReceiver.onReceive(): Received SMS: number='"
 									+ number + "' body='" + body + "'");
 
-					DisplayNotification req = new DisplayNotification();
+					// DisplayNotification req = new DisplayNotification();
+					// req.vibrateOnDuration = 500;
+					// req.vibrateOffDuration = 500;
+					// req.vibrateNumberOfCycles = 3;
+					// req.oledTopText = "SMS";
+					// req.oledBottomLine1Text = number;
+					// req.oledBottomLine2Text = body;
+					// req.lcdText = "SMS: " + number + "\n" + body;
 
-					req.vibrateOnDuration = 500;
-					req.vibrateOffDuration = 500;
-					req.vibrateNumberOfCycles = 3;
-
-					req.oledTopText = "SMS";
-					req.oledBottomLine1Text = number;
-					req.oledBottomLine2Text = body;
-
-					req.lcdText = "SMS: " + number + "\n" + body;
+					DisplayNotification req = new DisplayNotification(3,
+							getSMSIcon(context), name, number, body);
 
 					context.sendBroadcast(req.toIntent());
 				}

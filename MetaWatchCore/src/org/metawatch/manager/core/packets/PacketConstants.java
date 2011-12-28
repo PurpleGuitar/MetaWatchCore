@@ -69,7 +69,7 @@ public interface PacketConstants {
 		/* status of the current display operation */
 		StatusChangeEvent(0x33),
 
-		ButtonEventMsg(0x34),
+		ButtonEventMessage(0x34),
 
 		GeneralPurposePhoneMsg(0x35), GeneralPurposeWatchMsg(0x36),
 		/*

@@ -19,42 +19,28 @@
   *  limitations under the License.                                           *
   *                                                                           *
   *****************************************************************************/
+package org.metawatch.manager.core.packets.outgoing;
 
-package org.metawatch.manager.core.packets;
-
+import org.metawatch.manager.core.lib.constants.WatchButton;
+import org.metawatch.manager.core.lib.constants.WatchButtonPressType;
+import org.metawatch.manager.core.lib.constants.WatchMode;
+import org.metawatch.manager.core.packets.DefaultWatchPacket;
+import org.metawatch.manager.core.packets.PacketConstants;
 import org.metawatch.manager.core.packets.PacketConstants.MessageType;
-import org.metawatch.manager.core.packets.incoming.ButtonEventMessage;
-import org.metawatch.manager.core.packets.incoming.GetDeviceTypeResponse;
-import org.metawatch.manager.core.packets.incoming.ReadBatteryVoltageResponse;
-import org.metawatch.manager.core.packets.incoming.StatusChangeEvent;
-import org.metawatch.manager.core.packets.incoming.UnknownPacket;
 
-public class PacketReader {
+import android.content.Context;
 
-	public static WatchPacket readPacket(byte[] bytes) {
+public class DisableButton extends DefaultWatchPacket {
 
-		MessageType msgType = MessageType
-				.getByID(bytes[PacketConstants.MESSAGE_TYPE_BYTE_LOCATION]);
-
-		switch (msgType) {
+	public DisableButton(Context context, WatchMode watchMode, WatchButton watchButton, WatchButtonPressType watchButtonPressType) {
 		
-		case GetDeviceTypeResponse:
-			return new GetDeviceTypeResponse(bytes);
-			
-		case ReadBatteryVoltageResponse:
-			return new ReadBatteryVoltageResponse(bytes);
-			
-		case StatusChangeEvent:
-			return new StatusChangeEvent(bytes);
+		initializeBytes(PacketConstants.PAYLOAD_START_BYTE_LOCATION + 3);
+		bytes[PacketConstants.MESSAGE_TYPE_BYTE_LOCATION] = MessageType.DisableButtonMsg.msg;
+		bytes[PacketConstants.OPTIONS_BYTE_LOCATION] = 0x00; // Reserved
 
-		case ButtonEventMessage:
-			return new ButtonEventMessage(bytes);
-
-		default:
-			return new UnknownPacket(bytes);
-
-		}
-
+		bytes[PacketConstants.PAYLOAD_START_BYTE_LOCATION + 0] = (byte) watchMode.value;
+		bytes[PacketConstants.PAYLOAD_START_BYTE_LOCATION + 1] = (byte) watchButton.value;
+		bytes[PacketConstants.PAYLOAD_START_BYTE_LOCATION + 2] = (byte) watchButtonPressType.value;
 	}
 
 }

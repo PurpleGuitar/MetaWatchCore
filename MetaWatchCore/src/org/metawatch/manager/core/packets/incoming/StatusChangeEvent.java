@@ -22,7 +22,9 @@
 
 package org.metawatch.manager.core.packets.incoming;
 
+import org.metawatch.manager.core.lib.constants.WatchMode;
 import org.metawatch.manager.core.packets.DefaultWatchPacket;
+import org.metawatch.manager.core.packets.PacketConstants;
 
 public class StatusChangeEvent extends DefaultWatchPacket {
 
@@ -48,6 +50,15 @@ public class StatusChangeEvent extends DefaultWatchPacket {
 	public StatusChangeEvent(byte[] bytes) {
 		this.bytes = bytes;
 	}
+	
+	public WatchMode getMode() {
+		int mode = 0;
+		mode += bytes[PacketConstants.OPTIONS_BYTE_LOCATION] & 0x01;
+		mode += bytes[PacketConstants.OPTIONS_BYTE_LOCATION] & 0x02;
+		mode += bytes[PacketConstants.OPTIONS_BYTE_LOCATION] & 0x04;
+		mode += bytes[PacketConstants.OPTIONS_BYTE_LOCATION] & 0x08;
+		return WatchMode.getByValue(mode);
+	}
 
 	public StatusChangeEventType getStatusChangeEventType() {
 		return StatusChangeEventType.fromValue(bytes[4]);
@@ -61,6 +72,7 @@ public class StatusChangeEvent extends DefaultWatchPacket {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("StatusChangeEvent:");
+		sb.append(" mode=" + getMode());
 		sb.append(" statusChangeEventType=" + getStatusChangeEventType());
 		sb.append(" freeScrollBufferBytes=" + getFreeScrollBufferBytes());
 		return sb.toString();

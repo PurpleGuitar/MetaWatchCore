@@ -19,61 +19,38 @@
  *  limitations under the License.                                           *
  *                                                                           *
  *****************************************************************************/
-package org.metawatch.manager.core.lib.utils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+package org.metawatch.manager.core.packets.incoming;
 
-import android.content.Context;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Bitmap.CompressFormat;
-import android.net.Uri;
-import android.provider.ContactsContract.PhoneLookup;
+import org.metawatch.manager.core.lib.constants.WatchButton;
+import org.metawatch.manager.core.packets.DefaultWatchPacket;
+import org.metawatch.manager.core.packets.PacketConstants;
+import org.metawatch.manager.core.packets.WatchButtonMeaning;
 
-public class Utils {
+public class ButtonEventMessage extends DefaultWatchPacket {
 
-	public static Bitmap loadBitmapFromAssets(Context context, String path) {
-		try {
-			InputStream inputStream = context.getAssets().open(path);
-			Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-			inputStream.close();
-			return bitmap;
-		} catch (IOException e) {
-			return null;
-		}
-	}
-	
-	public static byte[] compressBitmap(Bitmap bitmap) {
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		bitmap.compress(CompressFormat.PNG, 0, bos);
-		return bos.toByteArray();		
+	public ButtonEventMessage(byte[] bytes) {
+		this.bytes = bytes;
 	}
 
-	public static String getContactNameFromNumber(Context context, String number) {
-
-		if (number.equals(""))
-			return "Private number";
-
-		String[] projection = new String[] { PhoneLookup.DISPLAY_NAME,
-				PhoneLookup.NUMBER };
-		Uri contactUri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI,
-				Uri.encode(number));
-		Cursor c = context.getContentResolver().query(contactUri, projection,
-				null, null, null);
-
-		if (c.moveToFirst()) {
-			String name = c.getString(c
-					.getColumnIndex(PhoneLookup.DISPLAY_NAME));
-
-			if (name.length() > 0)
-				return name;
-			else
-				return number;
-		}
-
-		return number;
+	public WatchButtonMeaning getButtonMeaning() {
+		return WatchButtonMeaning
+				.getByValue(bytes[PacketConstants.OPTIONS_BYTE_LOCATION]);
 	}
+
+	public WatchButton getButton() {
+		return WatchButton
+				.getByValue(bytes[PacketConstants.PAYLOAD_START_BYTE_LOCATION]);
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("ButtonEventMessage: callbackOptions=");
+		sb.append(getButtonMeaning());
+		sb.append(" button=");
+		sb.append(getButton());
+		return sb.toString();
+	}
+
 }

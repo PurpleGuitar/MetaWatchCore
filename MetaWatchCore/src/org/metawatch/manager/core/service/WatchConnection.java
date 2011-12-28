@@ -1,24 +1,24 @@
- /*****************************************************************************
-  *  Some of the code in this project is derived from the                     *
-  *  MetaWatch MWM-for-Android project,                                       *
-  *  Copyright (c) 2011 Meta Watch Ltd.                                       *
-  *  www.MetaWatch.org                                                        *
-  *                                                                           *
-  =============================================================================
-  *                                                                           *
-  *  Licensed under the Apache License, Version 2.0 (the "License");          *
-  *  you may not use this file except in compliance with the License.         *
-  *  You may obtain a copy of the License at                                  *
-  *                                                                           *
-  *    http://www.apache.org/licenses/LICENSE-2.0                             *
-  *                                                                           *
-  *  Unless required by applicable law or agreed to in writing, software      *
-  *  distributed under the License is distributed on an "AS IS" BASIS,        *
-  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
-  *  See the License for the specific language governing permissions and      *
-  *  limitations under the License.                                           *
-  *                                                                           *
-  *****************************************************************************/
+/*****************************************************************************
+ *  Some of the code in this project is derived from the                     *
+ *  MetaWatch MWM-for-Android project,                                       *
+ *  Copyright (c) 2011 Meta Watch Ltd.                                       *
+ *  www.MetaWatch.org                                                        *
+ *                                                                           *
+ =============================================================================
+ *                                                                           *
+ *  Licensed under the Apache License, Version 2.0 (the "License");          *
+ *  you may not use this file except in compliance with the License.         *
+ *  You may obtain a copy of the License at                                  *
+ *                                                                           *
+ *    http://www.apache.org/licenses/LICENSE-2.0                             *
+ *                                                                           *
+ *  Unless required by applicable law or agreed to in writing, software      *
+ *  distributed under the License is distributed on an "AS IS" BASIS,        *
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+ *  See the License for the specific language governing permissions and      *
+ *  limitations under the License.                                           *
+ *                                                                           *
+ *****************************************************************************/
 package org.metawatch.manager.core.service;
 
 import java.io.ByteArrayOutputStream;
@@ -30,6 +30,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.metawatch.manager.core.constants.Constants;
+import org.metawatch.manager.core.lib.constants.WatchButton;
+import org.metawatch.manager.core.lib.constants.WatchButtonPressType;
 import org.metawatch.manager.core.lib.constants.WatchConnectionState;
 import org.metawatch.manager.core.lib.constants.WatchMode;
 import org.metawatch.manager.core.lib.constants.WatchType;
@@ -39,11 +41,15 @@ import org.metawatch.manager.core.lib.intents.WatchConnectionInfo;
 import org.metawatch.manager.core.lib.intents.WatchIntentConstants;
 import org.metawatch.manager.core.packets.PacketReader;
 import org.metawatch.manager.core.packets.PacketUtils;
+import org.metawatch.manager.core.packets.WatchButtonMeaning;
 import org.metawatch.manager.core.packets.WatchPacket;
+import org.metawatch.manager.core.packets.incoming.ButtonEventMessage;
 import org.metawatch.manager.core.packets.incoming.GetDeviceTypeResponse;
 import org.metawatch.manager.core.packets.incoming.ReadBatteryVoltageResponse;
 import org.metawatch.manager.core.packets.incoming.StatusChangeEvent;
 import org.metawatch.manager.core.packets.incoming.StatusChangeEvent.StatusChangeEventType;
+import org.metawatch.manager.core.packets.outgoing.DisableButton;
+import org.metawatch.manager.core.packets.outgoing.EnableButton;
 import org.metawatch.manager.core.packets.outgoing.GetDeviceType;
 import org.metawatch.manager.core.packets.outgoing.ReadBatteryVoltage;
 import org.metawatch.manager.core.packets.outgoing.SetRealTimeClock;
@@ -168,6 +174,18 @@ public class WatchConnection {
 					}
 					break;
 
+				case ButtonEventMessage:
+					ButtonEventMessage buttonEventMessage = (ButtonEventMessage) packet;
+					if (buttonEventMessage.getButtonMeaning() == WatchButtonMeaning.DISMISS_NOTIFICATION) {
+						/* Unhook button and return to idle. */
+						sendPacket(new DisableButton(context,
+								WatchMode.NOTIFICATION, WatchButton.C,
+								WatchButtonPressType.PRESS_AND_RELEASE));
+						sendPacket(new UpdateLCDDisplay(WatchMode.IDLE));
+						displayingNotification = false;
+					}
+					break;
+
 				default:
 					Log.d(Constants.LOG_TAG,
 							"WatchConnection.BluetoothListener.readPacket(): Don't know what to do with this packet.");
@@ -181,8 +199,9 @@ public class WatchConnection {
 		}
 	}
 
-	private volatile BlockingQueue<byte[]>	packetSendQueue		= new LinkedBlockingQueue<byte[]>();
-	private volatile boolean				packetSenderRunning	= false;
+	private volatile BlockingQueue<byte[]>	packetSendQueue			= new LinkedBlockingQueue<byte[]>();
+	private volatile boolean				packetSenderRunning		= false;
+	private volatile boolean				displayingNotification	= false;
 
 	private class PacketSender implements Runnable {
 		public void run() {
@@ -282,6 +301,8 @@ public class WatchConnection {
 						// TODO notification guard?
 						for (WatchPacket packet : message.getPackets()) {
 
+							boolean suppressPacket = false;
+
 							/*
 							 * Special case handling for OLED scroll buffer
 							 * packets.
@@ -302,21 +323,40 @@ public class WatchConnection {
 												+ scrollBufferSize);
 							}
 
-							sendPacket(packet);
-
 							/*
-							 * LCD only -- if we've just jumped into
-							 * notification mode, wait a few seconds to give the
-							 * user a chance to read it, then jump back to idle
-							 * mode.
+							 * LCD only
 							 */
 							if (packet instanceof UpdateLCDDisplay) {
 								UpdateLCDDisplay update = (UpdateLCDDisplay) packet;
 								if (update.getWatchMode() == WatchMode.NOTIFICATION) {
-									Thread.sleep(8000);
-									sendPacket(new UpdateLCDDisplay(
-											WatchMode.IDLE));
+									/*
+									 * if we've just jumped into notification
+									 * mode, hook the lower right button. We'll
+									 * keep the notification on the screen until
+									 */
+									displayingNotification = true;
+									EnableButton enableButton = new EnableButton(
+											context,
+											WatchMode.NOTIFICATION,
+											WatchButton.C,
+											WatchButtonPressType.PRESS_AND_RELEASE,
+											WatchButtonMeaning.DISMISS_NOTIFICATION);
+									sendPacket(enableButton);
+								} else if (update.getWatchMode() == WatchMode.IDLE) {
+									/*
+									 * If we're currently displaying a
+									 * notification, don't update the LCD screen
+									 * right now.
+									 */
+									if (displayingNotification) {
+										suppressPacket = true;
+									}
 								}
+							}
+
+							/* Send the packet unless it's been suppressed. */
+							if (suppressPacket == false) {
+								sendPacket(packet);
 							}
 
 							/*
@@ -349,7 +389,6 @@ public class WatchConnection {
 				}
 			}
 		}
-
 	};
 
 	private Thread	messageSenderThread	= null;

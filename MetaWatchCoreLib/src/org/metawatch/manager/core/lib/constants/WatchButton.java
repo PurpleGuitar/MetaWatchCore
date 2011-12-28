@@ -19,61 +19,24 @@
  *  limitations under the License.                                           *
  *                                                                           *
  *****************************************************************************/
-package org.metawatch.manager.core.lib.utils;
+package org.metawatch.manager.core.lib.constants;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+public enum WatchButton {
+	A(0), B(1), C(2), D(3),
+	/* RESERVED(4) */
+	E(5), F(6), CROWN_PULL(7);
+	public final int	value;
 
-import android.content.Context;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Bitmap.CompressFormat;
-import android.net.Uri;
-import android.provider.ContactsContract.PhoneLookup;
-
-public class Utils {
-
-	public static Bitmap loadBitmapFromAssets(Context context, String path) {
-		try {
-			InputStream inputStream = context.getAssets().open(path);
-			Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-			inputStream.close();
-			return bitmap;
-		} catch (IOException e) {
-			return null;
-		}
-	}
-	
-	public static byte[] compressBitmap(Bitmap bitmap) {
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		bitmap.compress(CompressFormat.PNG, 0, bos);
-		return bos.toByteArray();		
+	WatchButton(int value) {
+		this.value = value;
 	}
 
-	public static String getContactNameFromNumber(Context context, String number) {
-
-		if (number.equals(""))
-			return "Private number";
-
-		String[] projection = new String[] { PhoneLookup.DISPLAY_NAME,
-				PhoneLookup.NUMBER };
-		Uri contactUri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI,
-				Uri.encode(number));
-		Cursor c = context.getContentResolver().query(contactUri, projection,
-				null, null, null);
-
-		if (c.moveToFirst()) {
-			String name = c.getString(c
-					.getColumnIndex(PhoneLookup.DISPLAY_NAME));
-
-			if (name.length() > 0)
-				return name;
-			else
-				return number;
+	public static WatchButton getByValue(int value) {
+		for (WatchButton mode : WatchButton.values()) {
+			if (mode.value == value) {
+				return mode;
+			}
 		}
-
-		return number;
+		return null;
 	}
 }

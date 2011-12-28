@@ -19,61 +19,33 @@
  *  limitations under the License.                                           *
  *                                                                           *
  *****************************************************************************/
-package org.metawatch.manager.core.lib.utils;
+package org.metawatch.manager.core.packets.outgoing;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import org.metawatch.manager.core.lib.constants.WatchButton;
+import org.metawatch.manager.core.lib.constants.WatchButtonPressType;
+import org.metawatch.manager.core.lib.constants.WatchMode;
+import org.metawatch.manager.core.packets.DefaultWatchPacket;
+import org.metawatch.manager.core.packets.PacketConstants;
+import org.metawatch.manager.core.packets.PacketConstants.MessageType;
+import org.metawatch.manager.core.packets.WatchButtonMeaning;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Bitmap.CompressFormat;
-import android.net.Uri;
-import android.provider.ContactsContract.PhoneLookup;
 
-public class Utils {
+public class EnableButton extends DefaultWatchPacket {
 
-	public static Bitmap loadBitmapFromAssets(Context context, String path) {
-		try {
-			InputStream inputStream = context.getAssets().open(path);
-			Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-			inputStream.close();
-			return bitmap;
-		} catch (IOException e) {
-			return null;
-		}
-	}
-	
-	public static byte[] compressBitmap(Bitmap bitmap) {
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		bitmap.compress(CompressFormat.PNG, 0, bos);
-		return bos.toByteArray();		
+	public EnableButton(Context context, WatchMode watchMode,
+			WatchButton watchButton, WatchButtonPressType watchButtonPressType,
+			WatchButtonMeaning watchButtonMeaning) {
+
+		initializeBytes(PacketConstants.PAYLOAD_START_BYTE_LOCATION + 5);
+		bytes[PacketConstants.MESSAGE_TYPE_BYTE_LOCATION] = MessageType.EnableButtonMsg.msg;
+		bytes[PacketConstants.OPTIONS_BYTE_LOCATION] = 0x00; // Reserved
+
+		bytes[PacketConstants.PAYLOAD_START_BYTE_LOCATION + 0] = (byte) watchMode.value;
+		bytes[PacketConstants.PAYLOAD_START_BYTE_LOCATION + 1] = (byte) watchButton.value;
+		bytes[PacketConstants.PAYLOAD_START_BYTE_LOCATION + 2] = (byte) watchButtonPressType.value;
+		bytes[PacketConstants.PAYLOAD_START_BYTE_LOCATION + 3] = 0x34;
+		bytes[PacketConstants.PAYLOAD_START_BYTE_LOCATION + 4] = watchButtonMeaning.value;
 	}
 
-	public static String getContactNameFromNumber(Context context, String number) {
-
-		if (number.equals(""))
-			return "Private number";
-
-		String[] projection = new String[] { PhoneLookup.DISPLAY_NAME,
-				PhoneLookup.NUMBER };
-		Uri contactUri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI,
-				Uri.encode(number));
-		Cursor c = context.getContentResolver().query(contactUri, projection,
-				null, null, null);
-
-		if (c.moveToFirst()) {
-			String name = c.getString(c
-					.getColumnIndex(PhoneLookup.DISPLAY_NAME));
-
-			if (name.length() > 0)
-				return name;
-			else
-				return number;
-		}
-
-		return number;
-	}
 }

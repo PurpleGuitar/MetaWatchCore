@@ -29,6 +29,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.ContentObserver;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.os.IBinder;
 import android.provider.CallLog;
 import android.provider.CallLog.Calls;
@@ -37,6 +38,17 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 
 public class MetaWatchPhoneService extends Service {
+
+	private static byte[]	phoneIcon	= null;
+
+	static byte[] getPhoneIcon(Context context) {
+		if (phoneIcon == null) {
+			Bitmap bitmap = Utils.loadBitmapFromAssets(context,
+					"phone_icon.bmp");
+			phoneIcon = Utils.compressBitmap(bitmap);
+		}
+		return phoneIcon;
+	}
 
 	/**
 	 * From: http://stackoverflow.com/questions/3665183/broadcast-receiver-for-
@@ -79,8 +91,9 @@ public class MetaWatchPhoneService extends Service {
 			case TelephonyManager.CALL_STATE_RINGING:
 				Log.d(Constants.LOG_TAG,
 						"MetaWatchPhoneService.MWPhoneStateListener.onCallStateChanged(): Phone is ringing!");
-				onStartPhoneRinging(Utils.getContactNameFromNumber(
-						MetaWatchPhoneService.this, incomingNumber),
+				sendPhoneRingingNotification(MetaWatchPhoneService.this,
+						Utils.getContactNameFromNumber(
+								MetaWatchPhoneService.this, incomingNumber),
 						incomingNumber);
 				break;
 			case TelephonyManager.CALL_STATE_IDLE:
@@ -100,19 +113,14 @@ public class MetaWatchPhoneService extends Service {
 
 	}
 
-	private void onStartPhoneRinging(String name, String number) {
-		DisplayNotification req = new DisplayNotification();
-
+	public static void sendPhoneRingingNotification(Context context,
+			String name, String number) {
+		DisplayNotification req = new DisplayNotification(3,
+				getPhoneIcon(context), name, number, "Incoming call");
+		/* Use an extra-long vibrate */
 		req.vibrateOnDuration = 1000;
-		req.vibrateOffDuration = 500;
-		req.vibrateNumberOfCycles = 3;
-
-		req.oledTopText = name;
-		req.oledBottomText = number;
-
-		req.lcdText = name + "\n\n" + number;
-
-		sendBroadcast(req.toIntent());
+		req.vibrateOffDuration = 1000;
+		context.sendBroadcast(req.toIntent());
 	}
 
 	public static int getMissedCallsCount(Context context) {
